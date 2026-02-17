@@ -5,77 +5,91 @@ import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { TMDB_IMAGE_BASE_PATH } from "@/hooks/useFetch";
+import { Movie } from "@/types";
+import { default_image } from "@/utils/assets";
+import { getGenreString } from "@/utils/genres";
 import { LinearGradient } from "expo-linear-gradient";
-const Overviewsection = () => {
-  return (
-    <View style={styles.overview}>
-      <Image 
-      style={styles.overviewImg} 
-      source={require("../assets/images/overview.png")}/>
+
+const Overviewsection = ({ movie }: { movie: Movie | null }) => {
+
+    const backdrop_image = movie?.backdrop_path
+        ? `${TMDB_IMAGE_BASE_PATH}${movie?.backdrop_path}`
+        : null;
+
+    const yearRelease = movie?.release_date?.split("-")[0] ?? ""
+    return (
+        <View style={styles.overview}>
+            <Image
+                style={styles.overviewImg}
+                source={backdrop_image ? { uri: backdrop_image } : default_image} />
 
 
-    {/* Overview Cover */}
-    <View style={styles.cover}>
-        <SafeAreaView style={{flex:1}}>
-            <View style={styles.header}>
-                <View style={{flexDirection: "row", alignItems: "center"}}>
-                    <Image style={styles.profile} source={require("../assets/images/profile.jpg")} 
-                    />
+            {/* Overview Cover */}
+            <View style={styles.cover}>
+                <SafeAreaView style={{ flex: 1 }}>
+                    <View style={styles.header}>
+                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                            <Image style={styles.profile} source={require("../assets/images/profile.jpg")}
+                            />
 
-                    <View style={{marginLeft: 8}}>
-                        <Text style={styles.greeting}>Hi, Dong Hil 👋</Text>
-                        <Text style={{color: Colors.text, fontSize:16}}>Welcome to</Text>
+                            <View style={{ marginLeft: 8 }}>
+                                <Text style={styles.greeting}>Hi, Dong Hil 👋</Text>
+                                <Text style={{ color: Colors.text, fontSize: 16 }}>Welcome to</Text>
+
+                            </View>
+                        </View>
+
+                        <TouchableOpacity style={styles.searchWrapper} activeOpacity={0.8}>
+                            <Feather name="search" size={24} color={Colors.text} />
+
+                        </TouchableOpacity>
+                    </View>
+
+                </SafeAreaView>
+                <LinearGradient style={styles.blur} colors={["transparent", Colors.background]}>
+                    <View style={styles.categoryBadge}>
+                        <Text style={{ color: Colors.text, fontWeight: "500", fontSize: 16 }}>
+                            Series
+                        </Text>
+                    </View>
+
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                        <Text numberOfLines={1}
+                            style={{ flex: 1, fontSize: 26, fontWeight: "600", color: Colors.text }}>
+                            {movie?.original_title}
+                        </Text>
+                        <View style={{ width: 75, alignItems: "flex-end" }}>
+                            <TouchableOpacity activeOpacity={.8} style={styles.playbtn}>
+                                <FontAwesome5 name="play" size={24} color={Colors.text} />
+                            </TouchableOpacity>
+                        </View>
 
                     </View>
-                </View>
 
-                <TouchableOpacity style={styles.searchWrapper} activeOpacity={0.8}>
-                    <Feather name="search" size={24} color={Colors.text}/>
-
-                </TouchableOpacity>
+                    <Text style={{ color: Colors.gray }}>
+                        {`${yearRelease} |  ${getGenreString(movie?.genre_ids || [])}`}
+                    </Text>
+                </LinearGradient>
             </View>
-
-        </SafeAreaView>
-        <LinearGradient style={styles.blur}  colors={["transparent", Colors.background]}>
-            <View style={styles.categoryBadge}>
-                <Text style={{color: Colors.text, fontWeight:"500", fontSize: 16}}> 
-                    Series
-                </Text>
-            </View>
-
-            <View style={{flexDirection: "row", alignItems:"center", justifyContent:"space-between"}}>
-                <Text numberOfLines={1}
-                style={{fontSize: 26, fontWeight: "600", color: Colors.text}}>
-                    The Sandman  
-                </Text>
-                <TouchableOpacity activeOpacity={.8} style={styles.playbtn}>
-                    <FontAwesome5 name="play" size={24} color={Colors.text}/>
-                </TouchableOpacity>
-            </View>
-
-            <Text style={{color: Colors.gray}}>
-                2025 | Monster Horror | Sci-fi Epic
-            </Text>
-        </LinearGradient>
-    </View>
-    </View>
-  );
+        </View>
+    );
 };
 
 export default Overviewsection
 
 const styles = StyleSheet.create({
-    overview:{
+    overview: {
         height: 400,
         position: "relative"
     },
-    overviewImg:{
+    overviewImg: {
         height: "100%",
         width: "100%",
         objectFit: "cover",
 
     },
-    cover:{
+    cover: {
         position: "absolute",
         top: 0,
         bottom: 0,
@@ -89,31 +103,31 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         padding: 14,
     },
-    profile:{
+    profile: {
         height: 45,
         width: 45,
         borderRadius: 50,
     },
-    greeting:{
+    greeting: {
         color: Colors.text,
         fontWeight: "600",
         fontSize: 22,
     },
-    searchWrapper:{
-        height:50 ,
+    searchWrapper: {
+        height: 50,
         width: 50,
         backgroundColor: "#535456",
         borderRadius: 50,
         alignItems: "center",
         justifyContent: "center",
     },
-    blur:{
+    blur: {
         height: 150,
         width: "100%",
         padding: 14,
         justifyContent: "space-around"
     },
-    categoryBadge:{
+    categoryBadge: {
         padding: 8,
         backgroundColor: Colors.surface,
         borderRadius: 14,
@@ -123,7 +137,7 @@ const styles = StyleSheet.create({
     playbtn: {
         height: 60,
         width: 60,
-        borderRadius: 30,      
+        borderRadius: 30,
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: Colors.surface,

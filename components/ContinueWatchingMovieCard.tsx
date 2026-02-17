@@ -1,14 +1,13 @@
 import { Colors } from "@/constants/colors";
+import { TMDB_IMAGE_BASE_PATH } from "@/hooks/useFetch";
 import { hs, vs } from "@/screen-dimensions";
+import { Movie } from "@/types";
+import { default_image } from "@/utils/assets";
+import { getGenreString } from "@/utils/genres";
 import { FontAwesome5 } from '@expo/vector-icons';
 import React from 'react';
-import { DimensionValue, Image, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { DimensionValue, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-interface ContinueWatchingMovieCardProps {
-    image?: ImageSourcePropType | undefined;
-    title: string
-    genre: string
-}
 
 // const ContinueWatchingMovieCard = ({genre, title, image}:ContinueWatchingMovieCardProps) => {
 //   return (
@@ -31,7 +30,7 @@ interface ContinueWatchingMovieCardProps {
 //     </TouchableOpacity>
 //   )
 // }
-const ContinueWatchingMovieCard = ({ genre, title, image }: ContinueWatchingMovieCardProps) => {
+const ContinueWatchingMovieCard = ({ movie }: { movie: Movie }) => {
     const getRandomPercenteage = (): DimensionValue => {
         const min = 10;
         const max = 100;
@@ -40,15 +39,21 @@ const ContinueWatchingMovieCard = ({ genre, title, image }: ContinueWatchingMovi
     }
 
     const randomPercentage = getRandomPercenteage()
-
+    const tmdb_image_path = movie
+        ? `${TMDB_IMAGE_BASE_PATH}${movie?.backdrop_path}`
+        : null;
     return (
         <View style={styles.container}>
             <View style={{ position: "relative" }}>
-                <TouchableOpacity style={styles.pressplay}>
-                    <FontAwesome5 name="play" size={24} color={"#202020"}></FontAwesome5>
+                <TouchableOpacity activeOpacity={0.8} style={styles.pressplay}>
+
+                    <View style={styles.playbtn}>
+                        <FontAwesome5 name="play" size={24} color={"#202020"} />
+                    </View>
+
                 </TouchableOpacity>
 
-                <Image source={image} style={styles.img} />
+                <Image source={tmdb_image_path ? { uri: tmdb_image_path } : default_image} style={styles.movie} />
 
                 <View style={styles.progressbarcontainer}>
                     <View style={[styles.progress, { width: randomPercentage }]} />
@@ -56,9 +61,16 @@ const ContinueWatchingMovieCard = ({ genre, title, image }: ContinueWatchingMovi
             </View>
 
             <View style={{ marginTop: 8 }}>
-                <Text numberOfLines={1} style={{ color: Colors.text, fontWeight: "600", fontSize: 16 }}>{title}</Text>
+                {/* <Text numberOfLines={1} style={{ color: Colors.text, fontWeight: "600", fontSize: 16 }}>{title}</Text>
 
-                <Text numberOfLines={1} style={{ color: Colors.text, fontWeight: "600", fontSize: 16 }}>{genre}</Text>
+                <Text numberOfLines={1} style={{ color: Colors.text, fontWeight: "600", fontSize: 16 }}>{genre}</Text> */}
+
+                <Text numberOfLines={1}
+                    style={{ color: Colors.text, fontWeight: "600", fontSize: 16 }}
+                >{movie?.title || movie?.original_name}</Text>
+                <Text numberOfLines={1}
+                    style={{ color: Colors.text, fontWeight: "600", fontSize: 16 }}
+                >{getGenreString(movie?.genre_ids || [])}</Text>
 
 
             </View>
@@ -85,11 +97,9 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-
         zIndex: 9999,
         alignItems: "center",
         justifyContent: "center",
-
     },
     progressbarcontainer: {
         marginTop: 8,
@@ -103,5 +113,18 @@ const styles = StyleSheet.create({
         height: "100%",
         backgroundColor: Colors.primary,
         borderRadius: 4,
+    },
+    movie: {
+        height: vs(170),
+        width: "100%",
+        borderRadius: 6,
+    },
+    playbtn: {
+        height: 60,
+        width: 60,
+        borderRadius: "50%",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: Colors.text,
     }
 })
