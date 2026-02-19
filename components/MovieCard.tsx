@@ -15,9 +15,20 @@ const MovieCard = ({ movie }: { movie: Movie }) => {
 
     const tmdb_image_path = movie ? `${TMDB_IMAGE_BASE_PATH}${movie?.poster_path}` : null;
 
+    console.log("genre ids >>", movie?.genre_ids)
+
 
     return (
-        <TouchableOpacity onPress={() => router.push("/details")} style={styles.container}>
+        <TouchableOpacity onPress={() => router.push({
+            pathname: "/details",
+            params: {
+                title: movie?.original_title || movie?.original_name,
+                backdrop_path: movie?.backdrop_path,
+                date: movie?.release_date,
+                genere_ids: movie?.genre_ids,
+                overview: movie?.overview,
+            }
+        })} style={styles.container}>
             <Image style={styles.img} source={tmdb_image_path ? { uri: tmdb_image_path } : default_image} />
 
 

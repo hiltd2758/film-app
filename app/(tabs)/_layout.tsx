@@ -41,7 +41,7 @@ const TabLayout = () => {
           tabBarLabel: "Movies",
           headerStyle: { backgroundColor: Colors.background },
           headerTitle: "",
-          headerRight: () =>{
+          headerRight: () => {
             return <RightIcon />
           },
           headerLeft: () => <Text style={styles.title}>Movies</Text>
@@ -52,10 +52,10 @@ const TabLayout = () => {
           tabBarIcon: ({ color }) => (
             <Feather name="folder" size={20} color={color} />
           ),
-          tabBarLabel: "Movies",
+          tabBarLabel: "TV/Series",
           headerStyle: { backgroundColor: Colors.background },
           headerTitle: "",
-          headerRight: () =>{
+          headerRight: () => {
             return <RightIcon />
           },
           headerLeft: () => <Text style={styles.title}>Tv Series</Text>

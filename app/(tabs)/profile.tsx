@@ -1,12 +1,33 @@
 import MovieCard from '@/components/MovieCard';
 import { Colors } from '@/constants/colors';
-import { movies } from '@/mock-data';
+import { useFetch } from '@/hooks/useFetch';
 import { ms } from "@/screen-dimensions";
+import { Movie } from '@/types';
 import React from 'react';
 import { FlatList, Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import SectionHeader from './../../components/SectionHeader';
-
 const ProfileScreen = () => {
+  const params = {
+    include_adult: false,
+    include_video: false,
+    language: "en-US",
+    page: 1,
+    sort_by: "popularity.desc"
+  }
+  const dateParams = {
+    include_adult: false,
+    include_video: false,
+    language: "en-US",
+    page: 1,
+    sort_by: "popularity.desc"
+  }
+
+
+  const { data: yesterdayData } = useFetch("/discover/movie", params)
+  const { data: dateData } = useFetch("/discover/movie", { ...params, page: 2 })
+
+  const yesterdateMovies: Movie[] = yesterdayData?.results
+  const dateMovies: Movie[] = dateData?.results
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -20,10 +41,8 @@ const ProfileScreen = () => {
         <View style={{ marginVertical: 12 }}>
 
           <SectionHeader title="Yesterday" />
-          <FlatList horizontal data={movies} renderItem={({ item }) => (<MovieCard
-            genre={item.genre}
-            title={item.title}
-            image={item.image} />
+          <FlatList horizontal data={yesterdateMovies} renderItem={({ item }) => (<MovieCard
+            movie={item} />
 
           )} />
         </View>
@@ -31,10 +50,8 @@ const ProfileScreen = () => {
         <View style={{ marginBottom: 12 }}>
 
           <SectionHeader title="15th January, 2026" />
-          <FlatList horizontal data={[...movies].reverse()} renderItem={({ item }) => (<MovieCard
-            genre={item.genre}
-            title={item.title}
-            image={item.image} />
+          <FlatList horizontal data={dateMovies || []} renderItem={({ item }) => (<MovieCard
+            movie={item} />
 
           )}
           />

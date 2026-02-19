@@ -2,22 +2,47 @@ import AppButton from '@/components/AppButton';
 import MovieCard from '@/components/MovieCard';
 import SectionHeader from '@/components/SectionHeader';
 import { Colors } from "@/constants/colors";
-import { movies } from '@/mock-data';
+import { TMDB_IMAGE_BASE_PATH, useFetch } from "@/hooks/useFetch";
+import { Movie } from '@/types';
+import { default_image } from '@/utils/assets';
+import { getGenreString } from '@/utils/genres';
 import { AntDesign, Feather, FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React from 'react';
 import { FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-
 const DetailsScreen = () => {
     const router = useRouter()
+
+    const { title, backdrop_path, date, genere_ids, overview } = useLocalSearchParams<any>()
+
+    const yearReleased = date?.split("-")[0] ?? ""
+    const backdropImage = backdrop_path
+        ? `${TMDB_IMAGE_BASE_PATH}${backdrop_path}`
+        : null;
+
+
+
+    const params = {
+        include_adult: false,
+        include_video: false,
+        language: "en-US",
+        page: 1,
+        sort_by: "popularity.desc"
+    }
+
+    const { data } = useFetch("/discover/movie", params)
+    const similarMovies: Movie[] = data?.results
     return (
         <View style={styles.container}>
             <ScrollView>
                 <View style={styles.overview}>
-                    <Image style={styles.overviewImg} source={require("@/assets/images/overview.png")} />
+                    <Image
+                        style={styles.overviewImg}
+                        source={backdropImage ? { uri: backdropImage } : default_image}
+                    />
 
 
                     <SafeAreaView style={styles.cover}>
@@ -31,11 +56,11 @@ const DetailsScreen = () => {
 
 
                             <Text numberOfLines={1} style={{ fontSize: 26, fontWeight: "600", color: Colors.text }} >
-                                The Sandman
+                                {title}
                             </Text>
 
                             <Text style={{ color: Colors.gray }}>
-                                2025 | Monster Horror | Sci-fi Epic
+                                {`${yearReleased} | ${getGenreString(genere_ids?.split(",").map(Number) || [])}`}
                             </Text>
 
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -87,7 +112,7 @@ const DetailsScreen = () => {
                         <Text style={{ color: Colors.primary, fontWeight: "600", fontSize: 18 }}>Overview</Text>
 
                         <Text style={{ color: Colors.text, marginTop: 10, fontSize: 12 }}>
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus suscipit reiciendis, sunt similique voluptates, rem dolores molestiae saepe error magnam nisi quisquam repellendus vitae optio ut! Nam sed quibusdam corrupti.
+                            {overview}
                         </Text>
                     </View>
                 </View>
@@ -97,12 +122,10 @@ const DetailsScreen = () => {
                     <SectionHeader title="You may also like" />
                     <FlatList
                         horizontal
-                        data={movies}
+                        data={similarMovies || []}
                         renderItem={({ item }) => (
                             <MovieCard
-                                genre={item.genre}
-                                title={item.title}
-                                image={item.image}
+                                movie={item}
 
                             />
                         )}
